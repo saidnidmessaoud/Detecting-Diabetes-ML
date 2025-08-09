@@ -66,3 +66,25 @@ model.summary()
 model.evaluate(test_ds)
 
 
+import numpy
+
+plt.figure(figsize=(10,10))
+for images, labels in test_ds.take(1):
+  classifications = model(images)
+  # print(classifications)
+
+  for i in range(9):
+    ax = plt.subplot(3, 3, i + 1)
+    plt.imshow(images[i].numpy().astype("uint8"))
+    index = numpy.argmax(classifications[i])
+    plt.title("Pred: " + class_names[index] + " | Real: " + class_names[labels[i]])
+plt.show()
+
+#Save and Deploy the model :
+
+#model.save("model.h5")
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+with open("model.tflite", 'wb') as f:
+  f.write(tflite_model)
